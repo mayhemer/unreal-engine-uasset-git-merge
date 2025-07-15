@@ -1,3 +1,27 @@
+<#
+~\.gitconfig
+
+[diff "UE_Diff"]
+    tool = UE_Diff_Tool
+    binary = true
+[difftool "UE_Diff_Tool"]
+    cmd = powershell 'D:\\scripts\\ue_merge.ps1' "$REMOTE" "$LOCAL"
+
+[merge "UE_Merge"]
+    tool = UE_Merge_Tool
+    binary = true
+[mergetool "UE_Merge_Tool"]
+    cmd = powershell 'D:\\scripts\\ue_merge.ps1' "$REMOTE" "$LOCAL" "$BASE" "$MERGED"
+	keepBackup = true
+
+[merge "UE_Compare_Only"]
+    tool = UE_Compare_Only_Tool
+    binary = true
+[mergetool "UE_Compare_Only_Tool"]
+    cmd = powershell 'D:\\scripts\\ue_merge.ps1' "$REMOTE" "$LOCAL"
+
+#>
+
 function Find-UProjectUpwards {
     param (
         [string]$Path
@@ -34,9 +58,15 @@ if (!$PROJECT_PATH) {
     return
 }
 
-$UE_PATH = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\EpicGames\Unreal Engine\5.2" -Name InstalledDirectory
-$UE_PATH = $UE_PATH + "\Engine\Binaries\Win64\UnrealEditor.exe"
+if ($Env:UE_EDITOR_EXE_PATH) {
+    $UE_EDITOR_EXE_PATH = $Env:UE_EDITOR_EXE_PATH
+} else {
+    $UE_EDITOR_EXE_PATH = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\EpicGames\Unreal Engine\5.2" -Name InstalledDirectory
+    $UE_EDITOR_EXE_PATH = $UE_EDITOR_EXE_PATH + "\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
+}
 
-& $UE_PATH $PROJECT_PATH -diff $args
-Write-Host 'Press a key when returned from the merge editor...'
-$null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
+& $UE_EDITOR_EXE_PATH $PROJECT_PATH -diff $args
+
+## The following is necessary when using `UnrealEditor.exe`
+# Write-Host 'Press a key when returned from the merge editor...'
+# $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
