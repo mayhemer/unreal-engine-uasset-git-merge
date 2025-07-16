@@ -15,9 +15,14 @@ if [ $# -lt 2 ]; then
     exit 2
 fi
 
+run_difftool() {
+    export TMPDIR="$(pwd)/Content"
+    git diff --name-only $1 -- $2 | xargs -I {} git difftool -y -t UE_Diff_Tool $1 -- {}
+}
+
 if [ $# -eq 3 ]; then
-    TMPDIR=$(realpath ./Content) git difftool -y -t UE_Diff_Tool $1 $2 -- $3
+    run_difftool "$1 $2" "$3"
 fi
 if [ $# -eq 2 ]; then
-    TMPDIR=$(realpath ./Content) git difftool -y -t UE_Diff_Tool $1 -- $2
+    run_difftool $1 "$2"
 fi
