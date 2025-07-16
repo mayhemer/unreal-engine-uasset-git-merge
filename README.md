@@ -3,6 +3,8 @@
 This is a set of scripts that add `git difftool` and `git mergetool` for Unreal Engine `.uasset` files.
 It can be useful for resolving conflicts when rebasing a local branch to master or merging master into a local branch.
 
+I specifically created this for `git rebase TargetBranch` and for plugins being git submodules, for whome the Unreal Editor source control feature doesn't work.
+
 The `/install.ps1` script installs the merge and diff tools to your `~/.gitconfig` and adds directory with public scripts to `PATH` to be used in Windows git-bash prompt.
 
 ## Environemnt variables to (optionally) configure
