@@ -28,7 +28,13 @@ The `/install.ps1` script installs the merge and diff tools to your `~/.gitconfi
   If you provide only a directory instead of a specific file, it will run the diff tool for all modified files in that directory, recursively.
 
 * `git_ue_diff_my` and `git_ue_diff_theirs`  
-  Useful when rebasing a branch to view our and their changes respectively.  
+  Useful for viewing conflicting files diffs when rebasing/merging a branch to view our and their changes respectively.  
   Again, run in the root directory of a project or plugin.  
+  Takes only one argument:
+  - relative path to the conflicting `.uasset` file to see the diff of
+
+* `git_ue_merge`  
+  Invokes the 3-pane Unreal's merge diff-tool.
+  Run in the root directory of a project or plugin.  
   Takes only one argument:
   - relative path to the conflicting `.uasset` file to see the diff of
