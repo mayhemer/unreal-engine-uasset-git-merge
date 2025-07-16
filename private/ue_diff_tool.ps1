@@ -1,5 +1,11 @@
 <#
 
+This is a PowerShell script that can be used as a difftool or a mergetool from inside git.
+It is hard-coded to use Unreal Engine 5.2 local installation, but it is easy to adjust to
+different UE versions.
+
+Configuration:
+
 * ~\.gitconfig
 ==============
 
@@ -7,27 +13,28 @@
     tool = UE_Diff_Tool
     binary = true
 [difftool "UE_Diff_Tool"]
-    cmd = powershell 'D:\\scripts\\ue_diff.ps1' "$REMOTE" "$LOCAL"
+    cmd = powershell 'C:\\path-to\\ue_diff_tool.ps1' "$REMOTE" "$LOCAL"
 
 [merge "UE_Merge"]
     tool = UE_Merge_Tool
     binary = true
 [mergetool "UE_Merge_Tool"]
-    cmd = powershell 'D:\\scripts\\ue_diff.ps1' "$REMOTE" "$LOCAL" "$BASE" "$MERGED"
+    cmd = powershell 'C:\\path-to\\ue_diff_tool.ps1' "$REMOTE" "$LOCAL" "$BASE" "$MERGED"
 	keepBackup = true
 
 [merge "UE_Compare_Remote_Base"]
     tool = UE_Compare_Remote_Base_Tool
     binary = true
 [mergetool "UE_Compare_Remote_Base_Tool"]
-    cmd = powershell 'D:\\scripts\\ue_diff.ps1' "$BASE" "$REMOTE"
+    cmd = powershell 'C:\\path-to\\ue_diff_tool.ps1' "$BASE" "$REMOTE"
 
 [merge "UE_Compare_Local_Base"]
     tool = UE_Compare_Local_Base_Tool
     binary = true
 [mergetool "UE_Compare_Local_Base_Tool"]
-    cmd = powershell 'D:\\scripts\\ue_diff.ps1' "$BASE" "$LOCAL"
+    cmd = powershell 'C:\\path-to\\ue_diff_tool.ps1' "$BASE" "$LOCAL"
 
+Usage:
 
 * git-bash
 ==========
@@ -147,6 +154,7 @@ function Invoke-Merge {
 # Main
 
 if ($args[0] -eq "nul") {
+    # sometimes, for directories, difftool is invoked with "nul" as a single arg.  what is the purpose I have no idea, we just ignore it
     return
 }
 
@@ -179,6 +187,7 @@ if (!$PROJECT_PATH) {
 if ($Env:UE_EDITOR_EXE_PATH) {
     $UE_EDITOR_EXE_PATH = $Env:UE_EDITOR_EXE_PATH
 } else {
+    # Unreal Engine executable auto-detection
     $UE_EDITOR_EXE_PATH = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\EpicGames\Unreal Engine\5.2" -Name InstalledDirectory
     $UE_EDITOR_EXE_PATH = $UE_EDITOR_EXE_PATH + "\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
 }

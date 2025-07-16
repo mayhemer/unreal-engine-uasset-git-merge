@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Helper script for diff-ing conflicting .usset Unreal Engine files to perform a diff during rebase
+
+# Note that this is using call to a merge tool, but actually just diffs the selected change
+# Reason is that the merge tool is very unreliable
+
+if [ $# -lt 1 ]; then
+    echo "During rebase of a user Branch to master, this script displays conflicting uasset diff between the 'base' and the Branch (user's changes)"
+    echo "Usage:"
+    echo "$ git_ue_diff_my Content/Path/ConflictingFile.uasset"
+    exit 2
+fi
+
+yes no | git mergetool -t UE_Compare_Remote_Base_Tool $1
+
+echo To accept user\'s changes, run:
+echo git checkout --theirs $1
+echo git add $1
