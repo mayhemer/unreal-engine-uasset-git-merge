@@ -129,10 +129,19 @@ function Invoke-Diff {
         [string]$Right
     )
 
-    Write-Host "  diff: " -NoNewline
-    Write-Host $Left "<->" $Right
-    
-    & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Left $Right
+    if ($Left -eq "nul") {
+        Write-Host "  added: " (Split-Path $Right -leaf)
+        & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Right $Right | out-null
+        return
+    }
+    if ($Right -eq "nul") {
+        Write-Host "  removed: " (Split-Path $Left -leaf)
+        & $UE_exe $Project $Env:UE_DIFF_ARGS -Diff $Left $Left | out-null
+        return
+    }
+
+    Write-Host "  diff: " (Split-Path $Right -leaf)
+    & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Left $Right | out-null
 }
 
 function Invoke-Merge {
@@ -145,23 +154,18 @@ function Invoke-Merge {
         [string]$Merge
     )
 
-    Write-Host "  merge: " -NoNewline
-    Write-Host $Base
+    Write-Host "  merge: " $Base
 
-    & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Remote $Local $Base $Merge
+    & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Remote $Local $Base $Merge | out-null
 }
 
 # Main
 
-if ($args[0] -eq "nul") {
-    # sometimes, for directories, difftool is invoked with "nul" as a single arg.  what is the purpose I have no idea, we just ignore it
-    return
-}
-
 for ($i = 0; $i -lt $args.length; $i++) {
     try {
+        if ($args[$i] -eq "nul") { continue }
+        
         $args[$i] = Resolve-Path $args[$i]
-
         if (!$PROJECT_PATH) {
             $PROJECT_PATH = $args[$i]
         }
@@ -184,13 +188,13 @@ if (!$PROJECT_PATH) {
     return
 }
 
-if ($Env:UE_EDITOR_EXE_PATH) {
-    $UE_EDITOR_EXE_PATH = $Env:UE_EDITOR_EXE_PATH
+if ($Env:UE_INSTALL_PATH) {
+    $UE_EDITOR_EXE_PATH = $Env:UE_INSTALL_PATH
 } else {
     # Unreal Engine executable auto-detection
     $UE_EDITOR_EXE_PATH = Get-ItemPropertyValue -Path "HKLM:\SOFTWARE\EpicGames\Unreal Engine\5.2" -Name InstalledDirectory
-    $UE_EDITOR_EXE_PATH = $UE_EDITOR_EXE_PATH + "\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
 }
+$UE_EDITOR_EXE_PATH = $UE_EDITOR_EXE_PATH + "\Engine\Binaries\Win64\UnrealEditor-Cmd.exe"
 
 if ($args.length -eq 2) {
     Invoke-Diff -UE_exe $UE_EDITOR_EXE_PATH -Project $PROJECT_PATH -Left $args[0] -Right $args[1]
