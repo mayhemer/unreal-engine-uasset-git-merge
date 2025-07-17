@@ -130,17 +130,19 @@ function Invoke-Diff {
     )
 
     if ($Left -eq "nul") {
-        Write-Host "  added: " (Split-Path $Right -leaf)
+        Write-Host "    added: " (Split-Path $Right -leaf) " " -NoNewline -ForegroundColor DarkGreen
+        Write-Host "[SHOWING DIFF OF ITSELF]" -BackgroundColor DarkGray -ForegroundColor Black
         & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Right $Right | out-null
         return
     }
     if ($Right -eq "nul") {
-        Write-Host "  removed: " (Split-Path $Left -leaf)
+        Write-Host "  removed: " (Split-Path $Left -leaf) " " -NoNewline -ForegroundColor DarkRed
+        Write-Host "[SHOWING DIFF OF ITSELF]" -BackgroundColor DarkGray -ForegroundColor Black
         & $UE_exe $Project $Env:UE_DIFF_ARGS -Diff $Left $Left | out-null
         return
     }
 
-    Write-Host "  diff: " (Split-Path $Right -leaf)
+    Write-Host " modified: " (Split-Path $Right -leaf) -ForegroundColor DarkBlue
     & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Left $Right | out-null
 }
 
@@ -154,8 +156,7 @@ function Invoke-Merge {
         [string]$Merge
     )
 
-    Write-Host "  merge: " $Base
-
+    Write-Host "    merge: " $Base -ForegroundColor DarkYellow
     & $UE_exe $Project $Env:UE_DIFF_ARGS -diff $Remote $Local $Base $Merge | out-null
 }
 
