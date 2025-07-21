@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Helper script for using the `git difftool` on Unreal Engine .uasset files
+
+if [ ! -d "Content" ]; then
+    echo "You need to be in the project or plugin directory root.  Can't find 'Content' directory here."
+    exit 2
+fi
+
+if [ $# -lt 2 ]; then
+    echo "Usage:"
+    echo "$ git_ue_diff commit..range Content/Path/[File.uasset]"
+    echo "    or"
+    echo "$ git_ue_diff commit1 commit2 Content/Path/[File.uasset]"
+    exit 2
+fi
+
+run_difftool() {
+    export TMPDIR="$(pwd)/Content"
+    git diff --name-only $1 -- $2 | xargs -I {} git difftool -y -t UE_Diff_Tool $1 -- {}
+}
+
+if [ $# -eq 3 ]; then
+    run_difftool "$1 $2" "$3"
+fi
+if [ $# -eq 2 ]; then
+    run_difftool $1 "$2"
+fi

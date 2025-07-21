@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Helper script for merging conflicting .usset Unreal Engine files
+# Note that the UE merge tool (-Diff L R B M) is unreliable and crashy
+
+if [ $# -lt 1 ]; then
+    echo "Invokes UE's merge tool you can use (with some luck) to examine and pick changes to merge"
+    echo "Usage:"
+    echo "$ git_ue_merge Content/Path/ConflictingFile.uasset"
+    exit 2
+fi
+
+git rebase --show-current-patch > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo ======================================================================
+    echo You are rebasing!  Keep in mind that 'theirs' and 'ours' are reversed!
+    echo ======================================================================
+fi
+
+git mergetool -t UE_Merge_Tool $1
