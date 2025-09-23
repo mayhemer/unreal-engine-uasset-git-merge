@@ -9,7 +9,7 @@ fi
 
 if [ $# -lt 2 ]; then
     echo "Usage:"
-    echo "$ git_ue_diff commit..range Content/Path/[File.uasset]"
+    echo "$ git_ue_diff child..parent Content/Path/[File.uasset]"
     echo "    or"
     echo "$ git_ue_diff commit1 commit2 Content/Path/[File.uasset]"
     exit 2
